@@ -1,0 +1,33 @@
+# Food items
+p1 = Pizza(101, 'Margherita Pizza', 250, 'Yes')
+b1 = Burger(102, 'Cheese Burger', 150, 'Yes')
+d1 = Beverage(103, 'Coke', 50, 'Yes')
+
+
+# Restaurant
+r1 = Restaurant(1, 'Pizza Hub')
+
+r1.add_food_item(p1)
+r1.add_food_item(b1)
+r1.add_food_item(d1)
+
+
+# Customer
+c1 = Customers(1, 'Prem')
+
+
+# Order
+o1 = Order(1001, c1, r1)
+
+
+# Add two items to order
+o1.add_item(101, 2)
+o1.add_item(103, 1)
+
+
+# Check the order
+print('Order ID:', o1.order_id)
+print('Customer:', o1.customer.cust_name)
+print('Restaurant:', o1.restaurant.rest_name)
+print('Items:', o1.items)
+print('Status:', o1.status)

@@ -1,33 +1,284 @@
-# Food items
-p1 = Pizza(101, 'Margherita Pizza', 250, 'Yes')
-b1 = Burger(102, 'Cheese Burger', 150, 'Yes')
-d1 = Beverage(103, 'Coke', 50, 'Yes')
+class Fooditem:
+    def __init__(self,food_id,food_name,food_price,availability):
+        self.food_id=food_id
+        self.food_name=food_name
+        self.food_price=food_price
+        self.availability=availability
+
+    def __str__(self):
+        return f'Food Id :{self.food_id}\n' f'Food_Name : {self.food_name}\n' f'Price :{self.food_price}\n' f'Available:{self.availability}'
 
 
-# Restaurant
-r1 = Restaurant(1, 'Pizza Hub')
+class Pizza(Fooditem):
+    def __str__(self):
+        return f'Pizza\n' f'Food Id :{self.food_id}\n' f'Food_Name : {self.food_name}\n' f'Price :{self.food_price}\n' f'Available:{self.availability}'
+
+
+class Burger(Fooditem):
+    def __str__(self):
+        return f'Burger\n' f'Food Id :{self.food_id}\n' f'Food_Name : {self.food_name}\n' f'Price :{self.food_price}\n' f'Available:{self.availability}'
+    
+
+class Beverage(Fooditem):
+    def __str__(self):
+        return f'Beverage\n' f'Food Id :{self.food_id}\n' f'Food_Name : {self.food_name}\n' f'Price :{self.food_price}\n' f'Available:{self.availability}'
+
+
+class Restaurant:
+    restaurants = {}
+
+    def __init__(self,rest_id,rest_name):
+        self.rest_id=rest_id
+        self.rest_name=rest_name
+        self.food_items={}
+        Restaurant.restaurants[self.rest_id]=self
+
+    def add_food_item(self, food):
+        self.food_items[food.food_id] = food
+
+    def display(self):
+        for i,j in self.food_items.items():
+            print(i,':',j.food_name)
+
+
+class FoodIterator:
+    def __init__(self, food_items):
+        self.food_items = food_items
+        self.index = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.index < len(self.food_items):
+            food = list(self.food_items.values())[self.index]
+            self.index += 1
+            return food
+        else:
+            raise StopIteration
+
+
+class Customers:
+    customers = {}
+
+    def __init__(self,cust_id,cust_name):
+        self.cust_id=cust_id
+        self.cust_name=cust_name
+        self.orders=[]
+        Customers.customers[self.cust_id]=self
+
+    def __str__(self):
+        return f'Customer_ID : {self.cust_id}\n' f'Customer_name : {self.cust_name}\n' f'Orders:{self.orders}\n'
+
+
+class Order:
+    def __init__(self,order_id,customer,restaurant):
+        self.order_id=order_id
+        self.customer=customer
+        self.restaurant=restaurant
+        self.items = {}
+        self.status = "Placed"
+
+        self.customer.orders.append(self)
+
+    def add_item(self, id, quantity):
+        try:
+            if id not in self.restaurant.food_items:
+                raise ValueError("Food item does not exist")
+
+            if quantity <= 0:
+                raise ValueError("Quantity must be greater than 0")
+
+            self.items[id] = quantity
+            print("Item added successfully")
+
+        except ValueError as e:
+            print("Error:", e)
+
+    def calculate_total(self):
+        total = 0
+
+        for food_id, quantity in self.items.items():
+            food = self.restaurant.food_items[food_id]
+            total = total + food.food_price * quantity
+
+        return total
+    
+    def modify_item(self, food_id, quantity):
+        try:
+            if food_id not in self.items:
+                raise ValueError("Food item not found in order")
+
+            if quantity < 0:
+                raise ValueError("Quantity cannot be negative")
+
+            if quantity == 0:
+                del self.items[food_id]
+            else:
+                self.items[food_id] = quantity
+
+        except ValueError as e:
+            print("Error:", e)
+
+    def update_status(self, status):
+        self.status = status
+        print("Order status:", self.status)
+
+
+# Generator
+
+def order_generator(orders):
+    for order in orders:
+        yield order
+
+
+# Decorator
+
+def log(func):
+    def wrapper():
+        print("Function started")
+        func()
+        print("Function ended")
+    return wrapper
+
+
+#  SAMPLE DATA 
+
+p1 = Pizza(101, "Margherita Pizza", 250, "Yes")
+p2 = Pizza(102, "Farmhouse Pizza", 350, "Yes")
+b1 = Burger(103, "Cheese Burger", 150, "Yes")
+d1 = Beverage(104, "Coke", 50, "Yes")
+
+r1 = Restaurant(1, "Pizza Hub")
 
 r1.add_food_item(p1)
+r1.add_food_item(p2)
 r1.add_food_item(b1)
 r1.add_food_item(d1)
 
-
-# Customer
-c1 = Customers(1, 'Prem')
+c1 = Customers(1, "Prem")
 
 
-# Order
-o1 = Order(1001, c1, r1)
+# MENU
+
+order_id = 1001
+current_order = None
+
+while True:
+
+    print("\n *** SMART FOOD DELIVERY *** ")
+    print("1. View Restaurants")
+    print("2. View Food Items")
+    print("3. Place Order")
+    print("4. Modify Order")
+    print("5. Calculate Bill")
+    print("6. Update Order Status")
+    print("7. View My Orders")
+    print("8. Exit")
+
+    choice = input("Enter your choice: ")
+
+    # View restaurants
+    if choice == "1":
+
+        for id, restaurant in Restaurant.restaurants.items():
+            print(id, ":", restaurant.rest_name)
 
 
-# Add two items to order
-o1.add_item(101, 2)
-o1.add_item(103, 1)
+    # View food
+    elif choice == "2":
+
+        print("\nFood Items:")
+
+        iterator = FoodIterator(r1.food_items)
+
+        for food in iterator:
+            print(food)
 
 
-# Check the order
-print('Order ID:', o1.order_id)
-print('Customer:', o1.customer.cust_name)
-print('Restaurant:', o1.restaurant.rest_name)
-print('Items:', o1.items)
-print('Status:', o1.status)
+    # Place order
+    elif choice == "3":
+
+        current_order = Order(order_id, c1, r1)
+        order_id += 1
+
+        print("\nFood Items:")
+        r1.display()
+
+        food_id = int(input("Enter Food ID: "))
+        quantity = int(input("Enter Quantity: "))
+
+        current_order.add_item(food_id, quantity)
+
+
+    # Modify order
+    elif choice == "4":
+
+        if current_order is None:
+            print("No order found")
+
+        else:
+            food_id = int(input("Enter Food ID: "))
+            quantity = int(input("Enter new quantity (0 to remove): "))
+
+            current_order.modify_item(food_id, quantity)
+
+
+    # Calculate bill
+    elif choice == "5":
+
+        if current_order is None:
+            print("No order found")
+
+        else:
+            total = current_order.calculate_total()
+            print("Total Bill:", total)
+
+
+    # Update status
+    elif choice == "6":
+
+        if current_order is None:
+            print("No order found")
+
+        else:
+            print("1. Preparing")
+            print("2. Out for Delivery")
+            print("3. Delivered")
+
+            status_choice = input("Enter choice: ")
+
+            if status_choice == "1":
+                current_order.update_status("Preparing")
+
+            elif status_choice == "2":
+                current_order.update_status("Out for Delivery")
+
+            elif status_choice == "3":
+                current_order.update_status("Delivered")
+
+            else:
+                print("Invalid choice")
+
+
+    # View orders using generator
+    elif choice == "7":
+
+        orders = order_generator(c1.orders)
+
+        for order in orders:
+            print("Order ID:", order.order_id)
+            print("Status:", order.status)
+            print("Total:", order.calculate_total())
+            print()
+
+
+    # Exit
+    elif choice == "8":
+
+        print("Thank you for using Smart Food Delivery System!")
+        break
+
+
+    else:
+        print("Invalid choice")
